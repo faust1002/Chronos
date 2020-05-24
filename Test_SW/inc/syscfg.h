@@ -1,0 +1,24 @@
+#ifndef __SYSCFG_H__
+#define __SYSCFG_H__
+
+#include <stdint.h>
+#include "hw_base.h"
+
+#define SYSCFG_RMPCR1 _SFR_(0x9E)
+#define SYSCFG_RMPCR1_ADC1DMA_REMAP_CHNDL_0    0u << 0
+#define SYSCFG_RMPCR1_ADC1DMADMA_REMAP_CHNDL_1 1u << 0
+#define SYSCFG_RMPCR1_ADC1DMADMA_REMAP_CHNDL_2 2u << 0
+#define SYSCFG_RMPCR1_ADC1DMADMA_REMAP_CHNDL_3 3u << 0
+#define SYSCFG_RMPCR1_TIM4DMADMA_REMAP_CHNDL_0 0u << 2
+#define SYSCFG_RMPCR1_TIM4DMADMA_REMAP_CHNDL_1 1u << 2
+#define SYSCFG_RMPCR1_TIM4DMADMA_REMAP_CHNDL_2 2u << 2
+#define SYSCFG_RMPCR1_TIM4DMADMA_REMAP_CHNDL_3 3u << 2
+#define SYSCFG_RMPCR1_USART1TR_REMAP_0         0u << 4
+#define SYSCFG_RMPCR1_USART1TR_REMAP_1         1u << 4
+#define SYSCFG_RMPCR1_USART1TR_REMAP_2         2u << 4
+#define SYSCFG_RMPCR1_USART1CK_REMAP_0         0u << 6
+#define SYSCFG_RMPCR1_USART1CK_REMAP_1         1u << 6
+#define SYSCFG_RMPCR1_SPI1_0                   0u << 7
+#define SYSCFG_RMPCR1_SPI1_1                   1u << 7
+
+#endif
