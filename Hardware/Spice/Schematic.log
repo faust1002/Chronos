@@ -1,0 +1,22 @@
+Circuit: * C:\Users\haha3\Documents\Chronos\Spice\Schematic.asc
+
+Direct Newton iteration for .op point succeeded.
+
+Date: Wed Feb 26 20:08:45 2020
+Total elapsed time: 0.468 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 9190
+traniter = 9172
+tranpoints = 1990
+accept = 1687
+rejected = 303
+matrix size = 292
+fillins = 231
+solver = Normal
+Thread vector: 15.7/6.9[8] 10.9/5.9[8] 8.9/3.5[8] 1.2/3.0[1]  2592/500
+Matrix Compiler1: 20.19 KB object code size  10.3/5.6/[2.4]
+Matrix Compiler2: 23.99 KB object code size  4.7/5.8/[1.5]
+
