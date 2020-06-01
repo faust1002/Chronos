@@ -1,7 +1,7 @@
 #!/usr/bin/python3.6
 
 import numpy as np
-import matplotlib
+import scipy.fft as fft
 import matplotlib.pyplot as plt
 
 def main():
@@ -33,12 +33,12 @@ def main():
 
     plt.subplot(1, 2, 2)
     nfft = 4098
-    fft = np.fft.rfft(signal, nfft)
-    fft = np.abs(fft)
-    fft = fft * 2 / nfft
-    freq = np.fft.rfftfreq(nfft, 1 / fs) / 1e3
+    spectrum = fft.rfft(signal, nfft)
+    spectrum = np.abs(spectrum)
+    spectrum = spectrum * 2 / nfft
+    freq = fft.rfftfreq(nfft, 1 / fs) / 1e3
 
-    plt.plot(freq, fft)
+    plt.plot(freq, spectrum)
     plt.title("Fourier transform")
     plt.xlabel("Frequency [kHz]")
     plt.ylabel("Magnitude [dB]")
