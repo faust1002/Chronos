@@ -2,10 +2,14 @@
 
 import numpy as np
 import scipy.fft as fft
+import matplotlib
 import matplotlib.pyplot as plt
 
 def main():
     print("Hello")
+
+    matplotlib.use("Qt5Agg")
+    plt.style.use("dark_background")
 
     f0 = 60e3
     f1 = 77.5e3
@@ -42,7 +46,7 @@ def main():
     spectrum = spectrum * 2 / nfft
     freq = fft.rfftfreq(nfft, 1 / fs) / 1e3
 
-    plt.plot(freq, spectrum)
+    plt.plot(freq[:250], spectrum[:250])
     plt.title("Fourier transform")
     plt.xlabel("Frequency [kHz]")
     plt.ylabel("Magnitude [dB]")
