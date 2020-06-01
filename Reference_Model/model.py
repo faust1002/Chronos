@@ -7,14 +7,18 @@ import matplotlib.pyplot as plt
 def main():
     print("Hello")
 
-    f0 = 77.5e3
-    f1 = 77.5e3 * 2
-    f2 = 77.5e3 * 3
-    fmax = np.max([f0, f1, f2])
+    f0 = 60e3
+    f1 = 77.5e3
+    f2 = 77.5e3 * 2
+    f3 = 77.5e3 * 3
+    fmax = np.max([f0, f1, f2, f3])
     fs = 50 * fmax
 
     t = np.arange(0, 10 * 1 / fmax, 1 / fs)
-    signal = 10 * np.sin(2 * np.pi * f0 * t) + 20 * np.sin(2 * np.pi * f1 * t) +  30 * np.sin(2 * np.pi * f2 * t)
+    signal = (5 * np.sin(2 * np.pi * f0 * t) +
+              10 * np.sin(2 * np.pi * f1 * t) +
+              20 * np.sin(2 * np.pi * f2 * t) +
+              30 * np.sin(2 * np.pi * f3 * t))
 
     signal_avr_power = 10 * np.log10(np.mean(signal ** 2))
     target_snr = 15
