@@ -7,6 +7,9 @@ import scipy.signal as signal
 import matplotlib
 import matplotlib.pyplot as plt
 
+fcarrier = 77.5e3
+fs       = 1e6
+
 def configure_logging(logfile):
     formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
     logger = logging.getLogger()
@@ -40,7 +43,7 @@ def plot_signal_in_time_and_freq_domain(time, test_vector, freq, spectrum):
 
     plt.show()
 
-def generate_test_vector(fcarrier, fs):
+def generate_test_vector():
     f0 = fcarrier / 2
     f1 = fcarrier * 2
     f2 = fcarrier * 3
@@ -52,7 +55,7 @@ def generate_test_vector(fcarrier, fs):
                    30 * np.sin(2 * np.pi * f2 * t))
     return (t, test_vector)
 
-def calculate_fft(test_vector, fs, nfft):
+def calculate_fft(test_vector, nfft):
     spectrum = fft.rfft(test_vector, nfft)
     spectrum = np.abs(spectrum)
     spectrum = spectrum * 2 / nfft
@@ -69,7 +72,7 @@ def add_noise(test_vector, target_snr):
     test_vector += noise
     return test_vector
 
-def bandpass_filter(test_vector, fs, fcarrier, fdelta):
+def bandpass_filter(test_vector, fdelta):
     fpass = np.array([fcarrier - fdelta, fcarrier + fdelta])
     fstop = np.array([fcarrier - 2 * fdelta, fcarrier + 2 * fdelta])
     N, Wn = signal.buttord(fpass, fstop, 3, 40, fs = fs)
@@ -84,21 +87,19 @@ def main():
     matplotlib.use("Qt5Agg")
     plt.style.use("dark_background")
 
-    fcarrier = 77.5e3
-    fs = 1e6
-    time, test_vector = generate_test_vector(fcarrier, fs)
+    time, test_vector = generate_test_vector()
 
     target_snr = 15
     test_vector = add_noise(test_vector, target_snr)
 
     nfft = 4098
-    spectrum, freq = calculate_fft(test_vector, fs, nfft)
+    spectrum, freq = calculate_fft(test_vector, nfft)
     plot_signal_in_time_and_freq_domain(time, test_vector, freq, spectrum)
 
     fdelta = 5e3
-    test_vector = bandpass_filter(test_vector, fs, fcarrier, fdelta)
+    test_vector = bandpass_filter(test_vector, fdelta)
 
-    spectrum, freq = calculate_fft(test_vector, fs, nfft)
+    spectrum, freq = calculate_fft(test_vector, nfft)
     plot_signal_in_time_and_freq_domain(time, test_vector, freq, spectrum)
 
     peek = freq[np.argmax(spectrum)]
