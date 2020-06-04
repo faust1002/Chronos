@@ -43,17 +43,29 @@ def plot_signal_in_time_and_freq_domain(time, test_vector, freq, spectrum):
 
     plt.show()
 
+def encode_bitstream(bitstream):
+    logging.info("Encoding bitstream = %s" % str(bitstream))
+    vector = np.array([])
+    for idx in bitstream:
+        bit = bitstream[idx]
+        low = int(fs / 10 * (1 + bit))
+        v = np.ones(int(fs))
+        v[0:low] = 0.15
+        vector = np.concatenate([vector, v])
+
+    time = np.arange(0, len(bitstream), 1 / fs)
+    vector = np.sin(2 * np.pi * fcarrier * time) * vector
+    return (time, vector)
+
 def generate_test_vector():
+    time, test_vector = encode_bitstream(np.array([0, 1, 0, 1]))
     f0 = fcarrier / 2
     f1 = fcarrier * 2
     f2 = fcarrier * 3
-    fmax = np.max([fcarrier, f0, f1, f2])
-    t = np.arange(0, 100 * 1 / fmax, 1 / fs)
-    test_vector = (5 * np.sin(2 * np.pi * f0 * t) +
-                   10 * np.sin(2 * np.pi * fcarrier * t) +
-                   20 * np.sin(2 * np.pi * f1 * t) +
-                   30 * np.sin(2 * np.pi * f2 * t))
-    return (t, test_vector)
+    test_vector += (0.5 * np.sin(2 * np.pi * f0 * time) +
+                      2 * np.sin(2 * np.pi * f1 * time) +
+                      3 * np.sin(2 * np.pi * f2 * time))
+    return (time, test_vector)
 
 def calculate_fft(test_vector, nfft):
     spectrum = fft.rfft(test_vector, nfft)
@@ -64,7 +76,6 @@ def calculate_fft(test_vector, nfft):
 
 def add_noise(test_vector, target_snr):
     test_vector_avr_power = 10 * np.log10(np.mean(test_vector ** 2))
-    target_snr = 15
     logging.info("Average test_vector power %.2fdBm, target SNR = %.2fdB" % (test_vector_avr_power, target_snr))
     noise_avr_power = test_vector_avr_power - target_snr
     mean_noise = 0
@@ -89,7 +100,7 @@ def main():
 
     time, test_vector = generate_test_vector()
 
-    target_snr = 15
+    target_snr = 5
     test_vector = add_noise(test_vector, target_snr)
 
     nfft = 4098
