@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 fcarrier = 77.5e3
 fs       = 1e6
+phasor   = np.exp(-1j * np.pi / 2) #used to convert from cosine to sine
 
 def configure_logging(logfile):
     formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
@@ -54,17 +55,17 @@ def encode_bitstream(bitstream):
         vector = np.concatenate([vector, v])
 
     time = np.arange(0, len(bitstream), 1 / fs)
-    vector = np.sin(2 * np.pi * fcarrier * time) * vector
-    return (time, vector)
+    vector = np.exp(1j * 2 * np.pi * fcarrier * time) * phasor * vector
+    return (time, np.real(vector))
 
 def generate_test_vector():
     time, test_vector = encode_bitstream(np.array([0, 1, 0, 1]))
     f0 = fcarrier / 2
     f1 = fcarrier * 2
     f2 = fcarrier * 3
-    test_vector += (0.5 * np.sin(2 * np.pi * f0 * time) +
-                      2 * np.sin(2 * np.pi * f1 * time) +
-                      3 * np.sin(2 * np.pi * f2 * time))
+    test_vector += np.real(0.5 * np.exp(1j * 2 * np.pi * f0 * time) * phasor +
+                             2 * np.exp(1j * 2 * np.pi * f1 * time) * phasor +
+                             3 * np.exp(1j * 2 * np.pi * f2 * time) * phasor)
     return (time, test_vector)
 
 def calculate_fft(test_vector, nfft):
@@ -95,7 +96,7 @@ def main():
     print("Hello")
 
     configure_logging("log.txt")
-    matplotlib.use("Qt5Agg")
+    #matplotlib.use("Qt5Agg")
     plt.style.use("dark_background")
 
     time, test_vector = generate_test_vector()
