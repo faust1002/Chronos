@@ -4,7 +4,6 @@ import logging
 import numpy as np
 import scipy.fft as fft
 import scipy.signal as signal
-import matplotlib
 import matplotlib.pyplot as plt
 
 fcarrier = 77.5e3
@@ -96,7 +95,6 @@ def main():
     print("Hello")
 
     configure_logging("log.txt")
-    #matplotlib.use("Qt5Agg")
     plt.style.use("dark_background")
 
     time, test_vector = generate_test_vector()
