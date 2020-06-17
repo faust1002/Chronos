@@ -6,9 +6,11 @@ import scipy.fft as fft
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 
+import TestVectorGenerator
+
 fcarrier = 77.5e3
 fs       = 1e6
-prsk     = [None, None]
+target_snr = 5
 
 def configure_logging(logfile):
     formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
@@ -43,61 +45,12 @@ def plot_signal_in_time_and_freq_domain(time, test_vector, freq, spectrum):
 
     plt.show()
 
-def generate_prsk():
-    lsfr = 0
-    seq_len = 512
-    chip_sequence = np.zeros(seq_len, dtype=int)
-    for idx in range(seq_len):
-        chip = lsfr & 1
-        chip_sequence[idx] = chip
-        lsfr >>= 1
-        if (chip == 1) or (lsfr == 0):
-            lsfr ^= 0x110
-
-    prsk[0] = chip_sequence
-    prsk[1] = chip_sequence ^ 1
-
-def encode_bitstream(bitstream):
-    logging.info("Encoding bitstream = %s" % str(bitstream))
-    vector = np.array([])
-    for idx in bitstream:
-        bit = bitstream[idx]
-        low = int(fs / 10 * (1 + bit))
-        v = np.ones(int(fs))
-        v[0:low] = 0.15
-        vector = np.concatenate([vector, v])
-
-    time = np.arange(0, len(bitstream), 1 / fs)
-    vector = np.exp(1j * 2 * np.pi * fcarrier * time) * vector
-    return (time, np.imag(vector))
-
-def generate_test_vector():
-    generate_prsk()
-
-    time, test_vector = encode_bitstream(np.array([0, 1, 0, 1]))
-    f0 = fcarrier / 2
-    f1 = fcarrier * 2
-    f2 = fcarrier * 3
-    test_vector += np.imag(0.5 * np.exp(1j * 2 * np.pi * f0 * time) +
-                             2 * np.exp(1j * 2 * np.pi * f1 * time) +
-                             3 * np.exp(1j * 2 * np.pi * f2 * time))
-    return (time, test_vector)
-
 def calculate_fft(test_vector, nfft):
     spectrum = fft.rfft(test_vector, nfft)
     spectrum = np.abs(spectrum)
     spectrum = spectrum * 2 / nfft
     freq = fft.rfftfreq(nfft, 1 / fs) / 1e3
     return (spectrum, freq)
-
-def add_noise(test_vector, target_snr):
-    test_vector_avr_power = 10 * np.log10(np.mean(test_vector ** 2))
-    logging.info("Average test_vector power %.2fdBm, target SNR = %.2fdB" % (test_vector_avr_power, target_snr))
-    noise_avr_power = test_vector_avr_power - target_snr
-    mean_noise = 0
-    noise = np.random.normal(mean_noise, np.sqrt(10 ** (noise_avr_power / 10)), len(test_vector))
-    test_vector += noise
-    return test_vector
 
 def bandpass_filter(test_vector, fdelta):
     fpass = np.array([fcarrier - fdelta, fcarrier + fdelta])
@@ -110,13 +63,12 @@ def bandpass_filter(test_vector, fdelta):
 def main():
     print("Hello")
 
+    test_vector_generator = TestVectorGenerator.TestVectorGenerator(fs, fcarrier, target_snr)
+
     configure_logging("log.txt")
     plt.style.use("dark_background")
 
-    time, test_vector = generate_test_vector()
-
-    target_snr = 5
-    test_vector = add_noise(test_vector, target_snr)
+    time, test_vector = test_vector_generator.generate([0, 1, 0, 1])
 
     nfft = 4098
     spectrum, freq = calculate_fft(test_vector, nfft)
