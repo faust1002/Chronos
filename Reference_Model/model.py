@@ -30,7 +30,7 @@ def configure_logging(logfile):
 def plot_signal_in_time_and_freq_domain(time, test_vector, freq, spectrum):
     plt.subplot(1, 2, 1)
     plt.plot(time * 1e3, test_vector)
-    plt.title("Signal + noise")
+    plt.title("Signal")
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [V]")
     plt.grid()
@@ -82,6 +82,27 @@ def main():
 
     peek = freq[np.argmax(spectrum)]
     logging.info("Found peek = %.2fkHz" % peek)
+
+    analytic_signal = signal.hilbert(test_vector)
+    amplitude_envelope = np.abs(analytic_signal)
+    instantaneous_phase = np.unwrap(np.angle(analytic_signal))
+    instantaneous_frequency = np.diff(instantaneous_phase) / (2.0 * np.pi) * fs
+
+    plt.subplot(1, 2, 1)
+    plt.plot(time, amplitude_envelope)
+    plt.title("Amplitude envelope")
+    plt.xlabel("Time [ms]")
+    plt.ylabel("Voltage [V]")
+    plt.grid()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(time[1:], instantaneous_frequency / 1e3)
+    plt.title("Instantaneous frequency")
+    plt.xlabel("Time [ms]")
+    plt.ylabel("Frequency [kHz]")
+    plt.grid()
+
+    plt.show()
 
     print("Goodbye")
 
